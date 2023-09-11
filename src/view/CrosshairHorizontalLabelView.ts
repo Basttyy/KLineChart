@@ -34,7 +34,7 @@ export default class CrosshairHorizontalLabelView<C extends Axis = YAxis> extend
     const pane = widget.getPane()
     const bounding = widget.getBounding()
     const chartStore = widget.getPane().getChart().getChartStore()
-    const crosshair = chartStore.getCrosshairStore().get()
+    const crosshair = chartStore.getTooltipStore().getCrosshair()
     const styles = chartStore.getStyles().crosshair
     if (crosshair.paneId !== undefined && this.compare(crosshair, pane.getId())) {
       if (styles.show) {
@@ -45,7 +45,7 @@ export default class CrosshairHorizontalLabelView<C extends Axis = YAxis> extend
           const text = this.getText(crosshair, chartStore, axis)
           ctx.font = createFont(textStyles.size, textStyles.weight, textStyles.family)
           this.createFigure(
-            'rectText',
+            'text',
             this.getTextAttrs(text, ctx.measureText(text).width, crosshair, bounding, axis, textStyles),
             textStyles
           )?.draw(ctx)
@@ -58,8 +58,8 @@ export default class CrosshairHorizontalLabelView<C extends Axis = YAxis> extend
     return crosshair.paneId === paneId
   }
 
-  protected getDirectionStyles (styels: CrosshairStyle): CrosshairDirectionStyle {
-    return styels.horizontal
+  protected getDirectionStyles (styles: CrosshairStyle): CrosshairDirectionStyle {
+    return styles.horizontal
   }
 
   protected getText (crosshair: Crosshair, chartStore: ChartStore, axis: C): string {
