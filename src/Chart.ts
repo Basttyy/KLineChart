@@ -196,7 +196,7 @@ export default class ChartImp implements Chart {
     const yAxisStyles = styles.yAxis
     const isYAxisLeft = yAxisStyles.position === YAxisPosition.Left
     const isOutside = !yAxisStyles.inside
-    const totolWidth = this._container.offsetWidth
+    const totalWidth = this._container.offsetWidth
     let mainWidth = 0
     let yAxisWidth = Number.MIN_SAFE_INTEGER
     let yAxisLeft = 0
@@ -204,31 +204,31 @@ export default class ChartImp implements Chart {
     this._panes.forEach(pane => {
       yAxisWidth = Math.max(yAxisWidth, pane.getAxisComponent().getAutoSize())
     })
-    if (yAxisWidth > totolWidth) {
-      yAxisWidth = totolWidth
+    if (yAxisWidth > totalWidth) {
+      yAxisWidth = totalWidth
     }
     if (isOutside) {
-      mainWidth = totolWidth - yAxisWidth
+      mainWidth = totalWidth - yAxisWidth
       if (isYAxisLeft) {
         yAxisLeft = 0
         mainLeft = yAxisWidth
       } else {
-        yAxisLeft = totolWidth - yAxisWidth
+        yAxisLeft = totalWidth - yAxisWidth
         mainLeft = 0
       }
     } else {
-      mainWidth = totolWidth
+      mainWidth = totalWidth
       mainLeft = 0
       if (isYAxisLeft) {
         yAxisLeft = 0
       } else {
-        yAxisLeft = totolWidth - yAxisWidth
+        yAxisLeft = totalWidth - yAxisWidth
       }
     }
 
     this._chartStore.getTimeScaleStore().setTotalBarSpace(mainWidth)
 
-    const paneBounding = { width: totolWidth }
+    const paneBounding = { width: totalWidth }
     const mainBounding = { width: mainWidth, left: mainLeft }
     const yAxisBounding = { width: yAxisWidth, left: yAxisLeft }
     this._panes.forEach((pane) => {
@@ -472,7 +472,7 @@ export default class ChartImp implements Chart {
   }
 
   clearData (): void {
-    this._chartStore.clearDataList()
+    this._chartStore.clear()
   }
 
   getDataList (): KLineData[] {
@@ -480,7 +480,7 @@ export default class ChartImp implements Chart {
   }
 
   applyNewData (dataList: KLineData[], more?: boolean, callback?: () => void): void {
-    this._chartStore.clearDataList()
+    this._chartStore.clear()
     if (dataList.length === 0) {
       this.adjustPaneViewport(false, true, true, true)
     } else {
@@ -803,7 +803,7 @@ export default class ChartImp implements Chart {
       case ActionType.OnCrosshairChange: {
         const crosshair = { ...data }
         crosshair.paneId = crosshair.paneId ?? PaneIdConstants.CANDLE
-        this._chartStore.getCrosshairStore().set(crosshair)
+        this._chartStore.getTooltipStore().setCrosshair(crosshair)
         break
       }
     }

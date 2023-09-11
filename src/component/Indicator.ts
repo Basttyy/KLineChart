@@ -25,7 +25,7 @@ import { XAxis } from './XAxis'
 import { YAxis } from './YAxis'
 
 import { formatValue } from '../common/utils/format'
-import { isValid } from '../common/utils/typeChecks'
+import { isValid, merge } from '../common/utils/typeChecks'
 
 import { ArcAttrs } from '../extension/figure/arc'
 import { RectAttrs } from '../extension/figure/rect'
@@ -76,7 +76,7 @@ export interface IndicatorFigure<D = any> {
   styles?: IndicatorFigureStylesCallback<D>
 }
 
-export type IndicatorRegenerateFiguresCallback<D = any> = (calcParms: any[]) => Array<IndicatorFigure<D>>
+export type IndicatorRegenerateFiguresCallback<D = any> = (calcParams: any[]) => Array<IndicatorFigure<D>>
 
 export interface IndicatorTooltipData {
   name: string
@@ -205,9 +205,9 @@ export interface Indicator<D = any> {
   result: D[]
 }
 
-export type IndicatorTemplate<D = any> = ExcludePickPartial<Omit<Indicator<D>, 'reult'>, 'name' | 'calc'>
+export type IndicatorTemplate<D = any> = ExcludePickPartial<Omit<Indicator<D>, 'result'>, 'name' | 'calc'>
 
-export type IndicatorCreate<D = any> = ExcludePickPartial<Omit<Indicator<D>, 'reult'>, 'name'>
+export type IndicatorCreate<D = any> = ExcludePickPartial<Omit<Indicator<D>, 'result'>, 'name'>
 
 export type IndicatorConstructor<D = any> = new () => IndicatorImp<D>
 
@@ -311,7 +311,7 @@ export default abstract class IndicatorImp<D = any> implements Indicator<D> {
     this.visible = visible ?? true
     this.minValue = minValue ?? null
     this.maxValue = maxValue ?? null
-    this.styles = styles ?? null
+    this.styles = styles ?? {}
     this.extendData = extendData
     this.regenerateFigures = regenerateFigures ?? null
     this.createTooltipDataSource = createTooltipDataSource ?? null
@@ -378,8 +378,8 @@ export default abstract class IndicatorImp<D = any> implements Indicator<D> {
   }
 
   setStyles (styles: Nullable<Partial<IndicatorStyle>>): boolean {
-    if (this.styles !== styles) {
-      this.styles = styles
+    if (styles !== null) {
+      merge(this.styles, styles)
       return true
     }
     return false
