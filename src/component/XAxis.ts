@@ -57,7 +57,7 @@ export default class XAxisImp extends AxisImp {
       }
       for (let i = 0; i < tickLength; i += tickCountDif) {
         const pos = parseInt(ticks[i].value as string, 10)
-        const kLineData = dataList[pos]
+        const kLineData = dataList[pos]   //we need to find a way to add only timestamp into the future
         const timestamp = kLineData.timestamp
         let text = formatDate(dateTimeFormat, timestamp, 'HH:mm', FormatDateType.XAxis)
         if (i !== 0) {
@@ -69,6 +69,7 @@ export default class XAxisImp extends AxisImp {
         const x = this.convertToPixel(pos)
         optimalTicks.push({ text, coord: x, value: timestamp })
       }
+      // the above patch may likely be a forloop here that will add
       const optimalTickLength = optimalTicks.length
       if (optimalTickLength === 1) {
         optimalTicks[0].text = formatDate(dateTimeFormat, optimalTicks[0].value as number, 'YYYY-MM-DD HH:mm', FormatDateType.XAxis)
