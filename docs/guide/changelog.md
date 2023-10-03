@@ -1,5 +1,21 @@
 # 📠 更新日志
 
+## 9.5.4
+`2023-09-22`
++ 🐞 修复样式`candle.type`是`area`时，最新价线不显示问题。
++ 🐞 修复样式`crosshair.vertical.text.paddingLeft`显示不对问题。
+
+## 9.5.3
+`2023-09-19`
++ 🐞 修复ts下引入问题。
+
+## 9.5.2
+`2023-09-18`
++ 💄 优化基础图形`text`。
++ 💄 优化内置覆盖物`simpleAnnotation`和`simpleTag`。
++ 💄 优化技术指标自由样式，支持增量。
++ 🐞 修复typescript声明问题。
+
 ## 9.5.1
 `2023-08-14`
 + 🆕 图表方法新增`getOverlayClass`。

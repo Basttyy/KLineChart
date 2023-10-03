@@ -1,5 +1,21 @@
 # 📠 Change Log
 
+## 9.5.4
+`2023-09-22`
++ 🐞 Fix the issue of not display the latest price line when the style `candle.type` is `area`.
++ 🐞 Fix the issue of incorrect display of the style `crosshair.vertical.text.paddingLeft`.
+
+## 9.5.3
+`2023-09-19`
++ 🐞 Fix typescript import error.
+
+## 9.5.2
+`2023-09-18`
++ 💄 Optimize the figure `text`.
++ 💄 Optimize built-in overlays `simpleAnnotation` and `simpleTag`.
++ 💄 Optimize the free style of technical indicators and support increment.
++ 🐞 Fix typescript declaration issue.
+
 ## 9.5.1
 `2023-08-14`
 + 🆕 Add chart api `getOverlayClass`.

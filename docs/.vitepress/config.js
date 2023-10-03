@@ -4,6 +4,11 @@ import pkg from '../../package.json'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  vite: {
+    server: {
+      port: 8888
+    }
+  },
   lang: 'zh-CN',
   title: 'KLineChart',
   description: '💹📈 可高度自定义的专业级轻量金融图表。',
@@ -47,7 +52,6 @@ export default defineConfig({
           { text: 'Pro', link: 'https://pro.klinecharts.com' },
           { text: '预览', link: 'https://preview.klinecharts.com' },
           { text: '赞助', link: '/sponsor' },
-          { text: '找工作', link: 'https://www.bolejobs.co' },
           {
             text: `V${pkg.version}`,
             items: [{ text: 'V8 文档', link: 'https://v8.klinecharts.com/zh-CN' }]
@@ -121,7 +125,8 @@ export default defineConfig({
         lastUpdatedText: '最后更新时间',
         sidebarMenuLabel: '菜单',
         darkModeSwitchLabel: '主题',
-        outlineTitle: '本页目录'
+        outlineTitle: '本页目录',
+        returnToTopLabel: '返回顶部',
       }
     },
     'en-US': {
@@ -134,7 +139,6 @@ export default defineConfig({
           { text: 'Pro', link: 'https://pro.klinecharts.com/en-US' },
           { text: 'Preview', link: 'https://preview.klinecharts.com/#en-US' },
           { text: 'Sponsor', link: '/en-US/sponsor' },
-          { text: 'Jobs', link: 'https://www.bolejobs.co' },
           {
             text: `V${pkg.version}`,
             items: [{ text: 'V8 Docs', link: 'https://v8.klinecharts.com' }]
