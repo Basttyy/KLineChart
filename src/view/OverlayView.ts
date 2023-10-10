@@ -120,7 +120,7 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
           }
         }
         const index = overlay.points.length - 1
-        return this._figureMouseClickEvent(
+        return this._figureMouseDoubleClickEvent(
           overlay,
           EventOverlayInfoFigureType.Point,
           `${OVERLAY_FIGURE_KEY_PREFIX}point_${index}`,

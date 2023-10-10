@@ -420,6 +420,7 @@ export default class ChartEvent implements EventHandler {
 
   touchStartEvent (e: MouseTouchEvent): boolean {
     const { pane, widget } = this._findWidgetByEvent(e)
+    this._mouseDownWidget = widget
     if (widget !== null) {
       const event = this._makeWidgetEvent(e, widget)
       const name = widget.getName()
@@ -434,6 +435,10 @@ export default class ChartEvent implements EventHandler {
             this._chart.updatePane(UpdateLevel.Overlay)
             return true
           }
+
+          const extremum = pane?.getAxisComponent().getExtremum() ?? null
+          this._prevYAxisExtremum = extremum === null ? extremum : { ...extremum }
+
           if (this._flingScrollRequestId !== null) {
             cancelAnimationFrame(this._flingScrollRequestId)
             this._flingScrollRequestId = null
@@ -457,12 +462,23 @@ export default class ChartEvent implements EventHandler {
           }
           return true
         }
-        case WidgetNameConstants.XAXIS:
+        case WidgetNameConstants.XAXIS: {
+          const consumed = widget.dispatchEvent('mouseDownEvent', event)
+          if (consumed) {
+            this._chart.updatePane(UpdateLevel.Overlay)
+          }
+          this._xAxisStartScaleCoordinate = { x: event.x, y: event.y }
+          this._xAxisStartScaleDistance = event.pageX
+          return consumed
+        }
         case WidgetNameConstants.YAXIS: {
           const consumed = widget.dispatchEvent('mouseDownEvent', event)
           if (consumed) {
             this._chart.updatePane(UpdateLevel.Overlay)
           }
+          const extremum = pane?.getAxisComponent().getExtremum() ?? null
+          this._prevYAxisExtremum = extremum === null ? extremum : { ...extremum }
+          this._yAxisStartScaleDistance = event.pageY
           return consumed
         }
       }
@@ -489,6 +505,7 @@ export default class ChartEvent implements EventHandler {
             event.preventDefault?.()
             tooltipStore.setCrosshair({ x: event.x, y: event.y, paneId: pane?.getId() })
           } else {
+            event.preventDefault?.()
             if (
               this._startScrollCoordinate !== null &&
               Math.abs(this._startScrollCoordinate.x - event.x) > this._startScrollCoordinate.y - event.y
@@ -501,19 +518,33 @@ export default class ChartEvent implements EventHandler {
         }
         case WidgetNameConstants.XAXIS:
         case WidgetNameConstants.YAXIS: {
-          const consumed = widget.dispatchEvent('pressedMouseMoveEvent', event)
-          if (consumed) {
-            event.preventDefault?.()
-            this._chart.updatePane(UpdateLevel.Overlay)
-          }
-          return consumed
+          e.preventDefault?.()
+          return this.pressedMouseMoveEvent(e)
         }
+        // case WidgetNameConstants.XAXIS:
+        // case WidgetNameConstants.YAXIS: {
+        //   const consumed = widget.dispatchEvent('pressedMouseMoveEvent', event)
+        //   if (consumed) {
+        //     event.preventDefault?.()
+        //     this._chart.updatePane(UpdateLevel.Overlay)
+        //   }
+        //   return consumed
+        // }
       }
     }
     return false
   }
 
   touchEndEvent (e: MouseTouchEvent): boolean {
+    const resetState = (): void => {
+      this._mouseDownWidget = null
+      this._startScrollCoordinate = null
+      this._prevYAxisExtremum = null
+      this._xAxisStartScaleCoordinate = null
+      this._xAxisStartScaleDistance = 0
+      this._xAxisScale = 1
+      this._yAxisStartScaleDistance = 0
+    }
     const { widget } = this._findWidgetByEvent(e)
     if (widget !== null) {
       const event = this._makeWidgetEvent(e, widget)
@@ -545,6 +576,7 @@ export default class ChartEvent implements EventHandler {
               flingScroll()
             }
           }
+          resetState()
           return true
         }
         case WidgetNameConstants.XAXIS:
@@ -553,6 +585,7 @@ export default class ChartEvent implements EventHandler {
           if (consumed) {
             this._chart.updatePane(UpdateLevel.Overlay)
           }
+          resetState()
         }
       }
     }
@@ -595,14 +628,16 @@ export default class ChartEvent implements EventHandler {
   }
 
   longTapEvent (e: MouseTouchEvent): boolean {
-    const { pane, widget } = this._findWidgetByEvent(e)
-    if (widget !== null && widget.getName() === WidgetNameConstants.MAIN) {
-      const event = this._makeWidgetEvent(e, widget)
-      this._touchCoordinate = { x: event.x, y: event.y }
-      this._chart.getChartStore().getTooltipStore().setCrosshair({ x: event.x, y: event.y, paneId: pane?.getId() })
-      return true
-    }
-    return false
+    return this.mouseRightClickEvent(e)
+    // TODO: find a way to add the below so that crosshair is shown if event was not on an object
+    // const { pane, widget } = this._findWidgetByEvent(e)
+    // if (widget !== null && widget.getName() === WidgetNameConstants.MAIN) {
+    //   const event = this._makeWidgetEvent(e, widget)
+    //   this._touchCoordinate = { x: event.x, y: event.y }
+    //   this._chart.getChartStore().getTooltipStore().setCrosshair({ x: event.x, y: event.y, paneId: pane?.getId() })
+    //   return true
+    // }
+    // return false
   }
 
   private _findWidgetByEvent (event: MouseTouchEvent): EventTriggerWidgetInfo {
