@@ -510,6 +510,31 @@ export default class ChartEvent implements EventHandler {
               this._startScrollCoordinate !== null &&
               Math.abs(this._startScrollCoordinate.x - event.x) > this._startScrollCoordinate.y - event.y
             ) {
+              const yAxis = pane?.getAxisComponent() as YAxis
+              if (this._prevYAxisExtremum !== null && !yAxis.getAutoCalcTickFlag() && yAxis.getScrollZoomEnabled()) {
+                const { min, max, range } = this._prevYAxisExtremum
+                let distance: number
+                if (yAxis?.isReverse() ?? false) {
+                  distance = this._startScrollCoordinate.y - event.y
+                } else {
+                  distance = event.y - this._startScrollCoordinate.y
+                }
+                const bounding = widget.getBounding()
+                const scale = distance / bounding.height
+                const difRange = range * scale
+                const newMin = min + difRange
+                const newMax = max + difRange
+                const newRealMin = yAxis.convertToRealValue(newMin)
+                const newRealMax = yAxis.convertToRealValue(newMax)
+                yAxis.setExtremum({
+                  min: newMin,
+                  max: newMax,
+                  range: newMax - newMin,
+                  realMin: newRealMin,
+                  realMax: newRealMax,
+                  realRange: newRealMax - newRealMin
+                })
+              }
               const distance = event.x - this._startScrollCoordinate.x
               chartStore.getTimeScaleStore().scroll(distance)
             }

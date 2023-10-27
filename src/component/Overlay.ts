@@ -29,6 +29,7 @@ import TimeScaleStore from '../store/TimeScaleStore'
 
 import { XAxis } from './XAxis'
 import { YAxis } from './YAxis'
+import KLineData from '../common/KLineData'
 
 export enum OverlayMode {
   Normal = 'normal',
@@ -682,7 +683,7 @@ export default abstract class OverlayImp implements Overlay {
     this._prevPressedPoints = clone(this.points)
   }
 
-  eventPressedOtherMove (point: Partial<Point>, timeScaleStore: TimeScaleStore): void {
+  eventPressedOtherMove (point: Partial<Point>, timeScaleStore: TimeScaleStore, datalist?: KLineData[]): void {
     if (this._prevPressedPoint !== null) {
       let difDataIndex: number
       if (point.dataIndex !== undefined && this._prevPressedPoint.dataIndex !== undefined) {
@@ -692,17 +693,41 @@ export default abstract class OverlayImp implements Overlay {
       if (point.value !== undefined && this._prevPressedPoint.value !== undefined) {
         difValue = point.value - this._prevPressedPoint.value
       }
+
+      if (datalist !== undefined) {
+        const result = this._prevPressedPoints.find((p) => {
+          const newPoint = { ...p }
+          if (difValue !== undefined && p.value !== undefined) {
+            newPoint.value = p.value + difValue
+          }
+          if (p.dataIndex === undefined && p.timestamp !== undefined) {
+            p.dataIndex = timeScaleStore.timestampToDataIndex(p.timestamp)
+          }
+          if (difDataIndex !== undefined && p.dataIndex !== undefined) {
+            newPoint.dataIndex = p.dataIndex + difDataIndex
+            newPoint.timestamp = timeScaleStore.dataIndexToTimestamp(newPoint.dataIndex) ?? undefined
+          }
+          const index = datalist.length - 1
+          if ((newPoint.timestamp === undefined) || (newPoint.timestamp !== undefined && (newPoint.timestamp > datalist[index].timestamp))) {
+            return true
+          }
+          return false
+        })
+        if (result !== undefined) {
+          return
+        }
+      }
       this.points = this._prevPressedPoints.map(p => {
+        const newPoint = { ...p }
+        if (difValue !== undefined && p.value !== undefined) {
+          newPoint.value = p.value + difValue
+        }
         if (p.dataIndex === undefined && p.timestamp !== undefined) {
           p.dataIndex = timeScaleStore.timestampToDataIndex(p.timestamp)
         }
-        const newPoint = { ...p }
         if (difDataIndex !== undefined && p.dataIndex !== undefined) {
           newPoint.dataIndex = p.dataIndex + difDataIndex
           newPoint.timestamp = timeScaleStore.dataIndexToTimestamp(newPoint.dataIndex) ?? undefined
-        }
-        if (difValue !== undefined && p.value !== undefined) {
-          newPoint.value = p.value + difValue
         }
         return newPoint
       })

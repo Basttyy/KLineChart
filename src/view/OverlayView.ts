@@ -163,7 +163,9 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
             if (figureType === EventOverlayInfoFigureType.Point) {
               instance.eventPressedPointMove(point, figureIndex)
             } else {
-              instance.eventPressedOtherMove(point, this.getWidget().getPane().getChart().getChartStore().getTimeScaleStore())
+              const pane = this.getWidget().getPane()
+              const klines = pane.getChart().getChartStore().getDataList()
+              instance.eventPressedOtherMove(point, this.getWidget().getPane().getChart().getChartStore().getTimeScaleStore(), klines)
             }
           }
         }
