@@ -68,6 +68,29 @@ export default class XAxisImp extends AxisImp {
         }
         const x = this.convertToPixel(pos)
         optimalTicks.push({ text, coord: x, value: timestamp })
+
+        if (optimalTicks.length > 2 && i === tickLength - (1 * tickCountDif)) {
+          const lastItem: AxisTick = optimalTicks[optimalTicks.length - 1]
+          const timestampStep = Number(lastItem.value) - Number(optimalTicks[optimalTicks.length - 2].value)
+          const coordStep = lastItem.coord - optimalTicks[optimalTicks.length - 2].coord
+          const jumps = 10
+          let newtime = 0
+          for (let j = 1; j < jumps; j += 1) {
+            // if (calcnextoff) {
+            //   calcnextoff = false
+            // }
+            newtime = Number(lastItem.value) + Number(j * timestampStep)
+            // if (newtime > nextskip && newtime < nextskipend) {
+            //   jumps++
+            //   continue
+            // }
+            optimalTicks.push({
+              text: this._optimalTickLabel(formatDate, dateTimeFormat, newtime, Number(lastItem.value)) ?? text,
+              coord: lastItem.coord + (j * coordStep),
+              value: Number(lastItem.value) + Number(j * timestampStep)
+            })
+          }
+        }
       }
       const optimalTickLength = optimalTicks.length
       if (optimalTickLength === 1) {
