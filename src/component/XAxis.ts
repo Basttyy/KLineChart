@@ -13,7 +13,7 @@
  */
 
 import Nullable from '../common/Nullable'
-import { FormatDate, FormatDateType } from '../common/Options'
+import { FormatDate, FormatDateType } from '../Options'
 
 import AxisImp, { Axis, AxisExtremum, AxisTick } from './Axis'
 
@@ -129,7 +129,7 @@ export default class XAxisImp extends AxisImp {
     return null
   }
 
-  getAutoSize (): number {
+  override getAutoSize (): number {
     const styles = this.getParent().getChart().getStyles()
     const xAxisStyles = styles.xAxis
     const height = xAxisStyles.size

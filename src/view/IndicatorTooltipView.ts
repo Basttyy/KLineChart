@@ -16,15 +16,14 @@ import Nullable from '../common/Nullable'
 import Bounding from '../common/Bounding'
 import KLineData from '../common/KLineData'
 import Crosshair from '../common/Crosshair'
-import { IndicatorStyle, TooltipStyle, TooltipIconStyle, TooltipTextStyle, TooltipData, TooltipShowRule, TooltipDataChild, TooltipIconPosition, CustomApi } from '../common/Options'
+import { IndicatorStyle, TooltipStyle, TooltipIconStyle, TooltipTextStyle, TooltipData, TooltipShowRule, TooltipDataChild, TooltipIconPosition } from '../common/Styles'
 import { ActionType } from '../common/Action'
 
-import XAxis from '../component/XAxis'
+import { CustomApi } from '../Options'
+
 import YAxis from '../component/YAxis'
 
 import IndicatorImp, { eachFigures, Indicator, IndicatorFigure, IndicatorFigureStyle, IndicatorTooltipData } from '../component/Indicator'
-
-import { PaneIdConstants } from '../pane/Pane'
 
 import { formatPrecision, formatThousands } from '../common/utils/format'
 import { isValid, isObject } from '../common/utils/typeChecks'
@@ -331,7 +330,7 @@ export default class IndicatorTooltipView extends View<YAxis> {
         bounding: widget.getBounding(),
         crosshair,
         defaultStyles: styles,
-        xAxis: pane.getChart().getPaneById(PaneIdConstants.XAXIS)?.getAxisComponent() as XAxis,
+        xAxis: pane.getChart().getXAxisPane().getAxisComponent(),
         yAxis: pane.getAxisComponent()
       })
       if (customName !== undefined && tooltipStyles.showName) {

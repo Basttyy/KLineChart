@@ -2,9 +2,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
-
  * http://www.apache.org/licenses/LICENSE-2.0
-
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,27 +10,36 @@
  * limitations under the License.
  */
 
-import Nullable from '../../common/Nullable'
-import DeepPartial from '../../common/DeepPartial'
-import { Styles } from '../../common/Styles'
-
-import light from './light'
-import dark from './dark'
-
-const styles: Record<string, DeepPartial<Styles>> = {
-  light,
-  dark
+export interface PaneGap {
+  top?: number
+  bottom?: number
 }
 
-function registerStyles (name: string, ss: DeepPartial<Styles>): void {
-  styles[name] = ss
+export interface PaneAxisOptions {
+  scrollZoomEnabled?: boolean
 }
 
-function getStyles (name: string): Nullable<DeepPartial<Styles>> {
-  return styles[name] ?? null
+export const enum PanePosition {
+  Top = 'top',
+  Bottom = 'bottom'
 }
 
-export {
-  registerStyles,
-  getStyles
+export interface PaneOptions {
+  id?: string
+  height?: number
+  minHeight?: number
+  dragEnabled?: boolean
+  position?: PanePosition
+  gap?: PaneGap
+  axisOptions?: PaneAxisOptions
+}
+
+export const PANE_MIN_HEIGHT = 30
+
+export const PANE_DEFAULT_HEIGHT = 100
+
+export const PaneIdConstants = {
+  CANDLE: 'candle_pane',
+  INDICATOR: 'indicator_pane_',
+  X_AXIS: 'x_axis_pane'
 }

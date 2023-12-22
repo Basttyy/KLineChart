@@ -19,10 +19,12 @@ import Precision from '../common/Precision'
 import Crosshair from '../common/Crosshair'
 import {
   Styles, CandleStyle, TooltipData, TooltipDataChild, TooltipShowType, CandleTooltipRectPosition,
-  CandleTooltipCustomCallbackData, YAxisPosition, PolygonType, CustomApi, FormatDateType
-} from '../common/Options'
+  CandleTooltipCustomCallbackData, YAxisPosition, PolygonType
+} from '../common/Styles'
 
-import { PaneIdConstants } from '../pane/Pane'
+import { CustomApi, FormatDateType } from '../Options'
+
+import { PaneIdConstants } from '../pane/types'
 
 import Indicator from '../component/Indicator'
 
@@ -435,6 +437,10 @@ export default class CandleTooltipView extends IndicatorTooltipView {
       '{close}': formatThousands(formatPrecision(current.close, pricePrecision), thousandsSeparator),
       '{volume}': formatThousands(
         customApi.formatBigNumber(formatPrecision(current.volume ?? tooltipStyles.defaultValue, volumePrecision)),
+        thousandsSeparator
+      ),
+      '{turnover}': formatThousands(
+        formatPrecision(current.turnover ?? tooltipStyles.defaultValue, pricePrecision),
         thousandsSeparator
       ),
       '{change}': prevClose === 0 ? tooltipStyles.defaultValue : `${formatPrecision(changeValue / prevClose * 100)}%`
