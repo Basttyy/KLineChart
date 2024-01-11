@@ -19,10 +19,15 @@ import Precision from '../common/Precision'
 import Crosshair from '../common/Crosshair'
 import {
   Styles, CandleStyle, TooltipData, TooltipDataChild, TooltipShowType, CandleTooltipRectPosition,
-  CandleTooltipCustomCallbackData, YAxisPosition, PolygonType, CustomApi, FormatDateType
-} from '../common/Options'
+  CandleTooltipCustomCallbackData, YAxisPosition, PolygonType
+} from '../common/Styles'
+import { formatPrecision, formatThousands } from '../common/utils/format'
+import { createFont } from '../common/utils/canvas'
+import { isFunction, isObject, isValid } from '../common/utils/typeChecks'
 
-import { PaneIdConstants } from '../pane/Pane'
+import { CustomApi, FormatDateType } from '../Options'
+
+import { PaneIdConstants } from '../pane/types'
 
 import Indicator from '../component/Indicator'
 
@@ -32,10 +37,6 @@ import { TooltipIcon } from '../store/TooltipStore'
 
 import { i18n } from '../extension/i18n/index'
 
-import { formatPrecision, formatThousands } from '../common/utils/format'
-import { createFont } from '../common/utils/canvas'
-import { isFunction, isObject } from '../common/utils/typeChecks'
-
 export default class CandleTooltipView extends IndicatorTooltipView {
   override drawImp (ctx: CanvasRenderingContext2D): void {
     const widget = this.getWidget()
@@ -43,7 +44,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
     const paneId = pane.getId()
     const chartStore = pane.getChart().getChartStore()
     const crosshair = chartStore.getTooltipStore().getCrosshair()
-    if (crosshair.kLineData !== undefined) {
+    if (isValid(crosshair.kLineData)) {
       const bounding = widget.getBounding()
       const yAxisBounding = pane.getYAxisWidget()?.getBounding() as Bounding
       const dataList = chartStore.getDataList()
@@ -180,7 +181,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
   private _drawRectTooltip (
     ctx: CanvasRenderingContext2D,
     dataList: KLineData[],
-    indicators: Map<string, Indicator>,
+    indicators: Indicator[],
     bounding: Bounding,
     yAxisBounding: Bounding,
     crosshair: Crosshair,
@@ -435,6 +436,10 @@ export default class CandleTooltipView extends IndicatorTooltipView {
       '{close}': formatThousands(formatPrecision(current.close, pricePrecision), thousandsSeparator),
       '{volume}': formatThousands(
         customApi.formatBigNumber(formatPrecision(current.volume ?? tooltipStyles.defaultValue, volumePrecision)),
+        thousandsSeparator
+      ),
+      '{turnover}': formatThousands(
+        formatPrecision(current.turnover ?? tooltipStyles.defaultValue, pricePrecision),
         thousandsSeparator
       ),
       '{change}': prevClose === 0 ? tooltipStyles.defaultValue : `${formatPrecision(changeValue / prevClose * 100)}%`

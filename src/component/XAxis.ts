@@ -13,11 +13,12 @@
  */
 
 import Nullable from '../common/Nullable'
-import { FormatDate, FormatDateType } from '../common/Options'
+import { calcTextWidth } from '../common/utils/canvas'
+import { isValid } from '../common/utils/typeChecks'
+
+import { FormatDate, FormatDateType } from '../Options'
 
 import AxisImp, { Axis, AxisExtremum, AxisTick } from './Axis'
-
-import { calcTextWidth } from '../common/utils/canvas'
 
 export type XAxis = Axis
 
@@ -68,6 +69,29 @@ export default class XAxisImp extends AxisImp {
         }
         const x = this.convertToPixel(pos)
         optimalTicks.push({ text, coord: x, value: timestamp })
+
+        if (optimalTicks.length > 2 && i === tickLength - (1 * tickCountDif)) {
+          const lastItem: AxisTick = optimalTicks[optimalTicks.length - 1]
+          const timestampStep = Number(lastItem.value) - Number(optimalTicks[optimalTicks.length - 2].value)
+          const coordStep = lastItem.coord - optimalTicks[optimalTicks.length - 2].coord
+          const jumps = 10
+          let newtime = 0
+          for (let j = 1; j < jumps; j += 1) {
+            // if (calcnextoff) {
+            //   calcnextoff = false
+            // }
+            newtime = Number(lastItem.value) + Number(j * timestampStep)
+            // if (newtime > nextskip && newtime < nextskipend) {
+            //   jumps++
+            //   continue
+            // }
+            optimalTicks.push({
+              text: this._optimalTickLabel(formatDate, dateTimeFormat, newtime, Number(lastItem.value)) ?? text,
+              coord: lastItem.coord + (j * coordStep),
+              value: Number(lastItem.value) + Number(j * timestampStep)
+            })
+          }
+        }
       }
       const optimalTickLength = optimalTicks.length
       if (optimalTickLength === 1) {
@@ -75,7 +99,7 @@ export default class XAxisImp extends AxisImp {
       } else {
         const firstTimestamp = optimalTicks[0].value as number
         const secondTimestamp = optimalTicks[1].value as number
-        if (optimalTicks[2] !== undefined) {
+        if (isValid(optimalTicks[2])) {
           const thirdText = optimalTicks[2].text
           if (/^[0-9]{2}-[0-9]{2}$/.test(thirdText)) {
             optimalTicks[0].text = formatDate(dateTimeFormat, firstTimestamp, 'MM-DD', FormatDateType.XAxis)
@@ -106,7 +130,7 @@ export default class XAxisImp extends AxisImp {
     return null
   }
 
-  getAutoSize (): number {
+  override getAutoSize (): number {
     const styles = this.getParent().getChart().getStyles()
     const xAxisStyles = styles.xAxis
     const height = xAxisStyles.size
