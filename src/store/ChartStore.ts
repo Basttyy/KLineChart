@@ -16,10 +16,9 @@ import KLineData from '../common/KLineData'
 import Precision from '../common/Precision'
 import VisibleData from '../common/VisibleData'
 import { getDefaultStyles, Styles } from '../common/Styles'
+import { isArray, isString, isValid, merge } from '../common/utils/typeChecks'
 
 import { getDefaultCustomApi, CustomApi, defaultLocale, Options } from '../Options'
-
-import { isArray, isString, merge } from '../common/utils/typeChecks'
 
 import TimeScaleStore from './TimeScaleStore'
 import IndicatorStore from './IndicatorStore'
@@ -121,26 +120,26 @@ export default class ChartStore {
   }
 
   setOptions (options?: Options): ChartStore {
-    if (options !== undefined) {
-      const { locale, timezone, styles, customApi } = options
-      if (locale !== undefined) {
+    if (isValid(options)) {
+      const { locale, timezone, styles, customApi, thousandsSeparator } = options
+      if (isString(locale)) {
         this._locale = locale
       }
-      if (timezone !== undefined) {
+      if (isString(timezone)) {
         this._timeScaleStore.setTimezone(timezone)
       }
-      if (styles !== undefined) {
+      if (isValid(styles)) {
         if (isString(styles)) {
           merge(this._styles, getStyles(styles))
         } else {
           merge(this._styles, styles)
         }
       }
-      if (customApi !== undefined) {
+      if (isValid(customApi)) {
         merge(this._customApi, customApi)
       }
-      if (options.thousandsSeparator !== undefined) {
-        this._thousandsSeparator = options.thousandsSeparator
+      if (isString(thousandsSeparator)) {
+        this._thousandsSeparator = thousandsSeparator
       }
     }
     return this
@@ -194,9 +193,9 @@ export default class ChartStore {
       const dataSize = this._dataList.length
       if (pos >= dataSize) {
         this._dataList.push(data)
-        let offsetRightBarCount = this._timeScaleStore.getOffsetRightBarCount()
-        if (offsetRightBarCount < 0) {
-          this._timeScaleStore.setOffsetRightBarCount(--offsetRightBarCount)
+        let lastBarRightSideDiffBarCount = this._timeScaleStore.getLastBarRightSideDiffBarCount()
+        if (lastBarRightSideDiffBarCount < 0) {
+          this._timeScaleStore.setLastBarRightSideDiffBarCount(--lastBarRightSideDiffBarCount)
         }
         this._timeScaleStore.adjustVisibleRange()
       } else {
