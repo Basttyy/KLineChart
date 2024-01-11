@@ -18,9 +18,11 @@ import Point from '../common/Point'
 import Bounding from '../common/Bounding'
 import BarSpace from '../common/BarSpace'
 import Precision from '../common/Precision'
-import { OverlayStyle, CustomApi } from '../common/Options'
+import { OverlayStyle } from '../common/Styles'
 import { EventHandler, EventName, MouseTouchEvent, MouseTouchEventCallback } from '../common/SyntheticEvent'
-import { isBoolean } from '../common/utils/typeChecks'
+import { isBoolean, isNumber, isValid } from '../common/utils/typeChecks'
+
+import { CustomApi } from '../Options'
 
 import Axis from '../component/Axis'
 import XAxis from '../component/XAxis'
@@ -30,14 +32,15 @@ import Overlay, { OVERLAY_FIGURE_KEY_PREFIX, OverlayFigure, OverlayFigureIgnoreE
 import OverlayStore, { ProgressOverlayInfo, EventOverlayInfo, EventOverlayInfoFigureType } from '../store/OverlayStore'
 import TimeScaleStore from '../store/TimeScaleStore'
 
-import { PaneIdConstants } from '../pane/Pane'
+import { PaneIdConstants } from '../pane/types'
 
-import Widget from '../widget/Widget'
+import DrawWidget from '../widget/DrawWidget'
+import DrawPane from '../pane/DrawPane'
 
 import View from './View'
 
 export default class OverlayView<C extends Axis = YAxis> extends View<C> {
-  constructor (widget: Widget<C>) {
+  constructor (widget: DrawWidget<DrawPane<C>>) {
     super(widget)
     this._initEvent()
   }
@@ -186,7 +189,7 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
     let eventHandler
     if (!overlay.isDrawing()) {
       let eventTypes: OverlayFigureIgnoreEventType[] = []
-      if (ignoreEvent !== undefined) {
+      if (isValid(ignoreEvent)) {
         if (isBoolean(ignoreEvent)) {
           if (ignoreEvent) {
             eventTypes = getAllOverlayFigureIgnoreEventTypes()
@@ -287,7 +290,7 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
     const paneId = pane.getId()
     const timeScaleStore = chart.getChartStore().getTimeScaleStore()
     if (this.coordinateToPointTimestampDataIndexFlag()) {
-      const xAxis = chart.getPaneById(PaneIdConstants.XAXIS)?.getAxisComponent() as Axis
+      const xAxis = chart.getXAxisPane().getAxisComponent()
       const dataIndex = xAxis.convertFromPixel(coordinate.x)
       const timestamp = timeScaleStore.dataIndexToTimestamp(dataIndex) ?? undefined
       const klines = chart.getChartStore().getDataList()
@@ -303,7 +306,7 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
     if (this.coordinateToPointValueFlag()) {
       const yAxis = pane.getAxisComponent()
       let value = yAxis.convertFromPixel(coordinate.y)
-      if (overlay.mode !== OverlayMode.Normal && paneId === PaneIdConstants.CANDLE && point.dataIndex !== undefined) {
+      if (overlay.mode !== OverlayMode.Normal && paneId === PaneIdConstants.CANDLE && isNumber(point.dataIndex)) {
         const kLineData = timeScaleStore.getDataByDataIndex(point.dataIndex)
         if (kLineData !== null) {
           const modeSensitivity = overlay.modeSensitivity
@@ -380,7 +383,7 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
     const paneId = pane.getId()
     const chart = pane.getChart()
     const yAxis = pane.getAxisComponent() as unknown as Nullable<YAxis>
-    const xAxis = chart.getPaneById(PaneIdConstants.XAXIS)?.getAxisComponent() as Nullable<XAxis>
+    const xAxis = chart.getXAxisPane().getAxisComponent()
     const bounding = widget.getBounding()
     const chartStore = chart.getChartStore()
     const customApi = chartStore.getCustomApi()
@@ -438,14 +441,14 @@ export default class OverlayView<C extends Axis = YAxis> extends View<C> {
     const { points } = overlay
     const coordinates = points.map(point => {
       let dataIndex = point.dataIndex
-      if (point.timestamp !== undefined) {
+      if (isNumber(point.timestamp)) {
         dataIndex = timeScaleStore.timestampToDataIndex(point.timestamp)
       }
       const coordinate = { x: 0, y: 0 }
-      if (dataIndex !== undefined) {
+      if (isNumber(dataIndex)) {
         coordinate.x = xAxis?.convertToPixel(dataIndex) ?? 0
       }
-      if (point.value !== undefined) {
+      if (isNumber(point.value)) {
         coordinate.y = yAxis?.convertToPixel(point.value) ?? 0
       }
       return coordinate

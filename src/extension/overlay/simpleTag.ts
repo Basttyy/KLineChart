@@ -16,22 +16,15 @@ import { formatPrecision } from '../../common/utils/format'
 
 import { OverlayTemplate } from '../../component/Overlay'
 
-import { isFunction, isValid } from '../../common/utils/typeChecks'
+import { isFunction, isNumber, isValid } from '../../common/utils/typeChecks'
+
+import { LineType } from '../../common/Styles'
 
 const simpleTag: OverlayTemplate = {
   name: 'simpleTag',
   totalStep: 2,
   styles: {
-    text: {
-      borderSize: 1,
-      borderRadius: 2,
-      borderColor: '#1677FF',
-      paddingLeft: 4,
-      paddingRight: 4,
-      paddingTop: 4,
-      paddingBottom: 4,
-      backgroundColor: '#1677FF'
-    }
+    line: { style: LineType.Dashed }
   },
   createPointFigures: ({ bounding, coordinates }) => {
     return {
@@ -64,7 +57,7 @@ const simpleTag: OverlayTemplate = {
         text = overlay.extendData(overlay)
       }
     }
-    if (!isValid(text) && overlay.points[0].value !== undefined) {
+    if (!isValid(text) && isNumber(overlay.points[0].value)) {
       text = formatPrecision(overlay.points[0].value, precision.price)
     }
     return { type: 'text', attrs: { x, y: coordinates[0].y, text: text ?? '', align: textAlign, baseline: 'middle' } }

@@ -17,7 +17,10 @@ import Coordinate from '../common/Coordinate'
 import Bounding from '../common/Bounding'
 import BarSpace from '../common/BarSpace'
 import Precision from '../common/Precision'
-import { OverlayStyle, CustomApi, FormatDateType } from '../common/Options'
+import { OverlayStyle } from '../common/Styles'
+import { isNumber } from '../common/utils/typeChecks'
+
+import { CustomApi, FormatDateType } from '../Options'
 
 import XAxis from '../component/XAxis'
 import YAxis from '../component/YAxis'
@@ -64,7 +67,7 @@ export default class OverlayXAxisView extends OverlayYAxisView<XAxis> {
         leftX = Math.min(leftX, coordinate.x)
         rightX = Math.max(rightX, coordinate.x)
         const point = overlay.points[index]
-        if (point.timestamp !== undefined) {
+        if (isNumber(point.timestamp)) {
           const text = customApi.formatDate(dateTimeFormat, point.timestamp, 'YYYY-MM-DD HH:mm', FormatDateType.Crosshair)
           figures.push({ type: 'text', attrs: { x: coordinate.x, y: 0, text, align: 'center' }, ignoreEvent: true })
         }
