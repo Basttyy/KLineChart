@@ -15,13 +15,9 @@
 import Nullable from '../common/Nullable'
 import VisibleData from '../common/VisibleData'
 import BarSpace from '../common/BarSpace'
-import { CandleType } from '../common/Options'
-
-import { PaneIdConstants } from '../pane/Pane'
+import { CandleType } from '../common/Styles'
 
 import ChartStore from '../store/ChartStore'
-
-import Axis from '../component/Axis'
 
 import { eachFigures, IndicatorFigure, IndicatorFigureAttrs, IndicatorFigureStyle } from '../component/Indicator'
 
@@ -36,8 +32,7 @@ export default class IndicatorView extends CandleBarView {
     const yAxis = pane.getAxisComponent()
     if (!yAxis.isInCandle()) {
       const indicators = chartStore.getIndicatorStore().getInstances(pane.getId())
-      for (const entries of indicators) {
-        const indicator = entries[1]
+      for (const indicator of indicators) {
         if (indicator.shouldOhlc && indicator.visible) {
           const indicatorStyles = indicator.styles
           const defaultStyles = chartStore.getStyles().indicator
@@ -70,7 +65,7 @@ export default class IndicatorView extends CandleBarView {
     const pane = widget.getPane()
     const chart = pane.getChart()
     const bounding = widget.getBounding()
-    const xAxis = chart.getPaneById(PaneIdConstants.XAXIS)?.getAxisComponent() as Axis
+    const xAxis = chart.getXAxisPane().getAxisComponent()
     const yAxis = pane.getAxisComponent()
     const chartStore = chart.getChartStore()
     const dataList = chartStore.getDataList()
@@ -78,8 +73,14 @@ export default class IndicatorView extends CandleBarView {
     const visibleRange = timeScaleStore.getVisibleRange()
     const indicators = chartStore.getIndicatorStore().getInstances(pane.getId())
     const defaultStyles = chartStore.getStyles().indicator
+    ctx.save()
     indicators.forEach(indicator => {
       if (indicator.visible) {
+        if (indicator.zLevel < 0) {
+          ctx.globalCompositeOperation = 'destination-over'
+        } else {
+          ctx.globalCompositeOperation = 'source-over'
+        }
         let isCover = false
         if (indicator.draw !== null) {
           ctx.save()
@@ -177,5 +178,6 @@ export default class IndicatorView extends CandleBarView {
         }
       }
     })
+    ctx.restore()
   }
 }

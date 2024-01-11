@@ -12,16 +12,18 @@
  * limitations under the License.
  */
 
+import { YAxisType, YAxisPosition, CandleType } from '../common/Styles'
+import { isValid, isNumber } from '../common/utils/typeChecks'
+
+import { index10, log10 } from '../common/utils/number'
+import { calcTextWidth } from '../common/utils/canvas'
+import { formatPrecision, formatThousands } from '../common/utils/format'
+
 import AxisImp, { Axis, AxisExtremum, AxisTick } from './Axis'
 
 import { IndicatorFigure } from './Indicator'
 
-import { YAxisType, YAxisPosition, CandleType } from '../common/Options'
-
-import { isValid } from '../common/utils/typeChecks'
-import { index10, log10 } from '../common/utils/number'
-import { calcTextWidth } from '../common/utils/canvas'
-import { formatPrecision, formatThousands } from '../common/utils/format'
+import { PaneIdConstants } from '../pane/types'
 
 interface FiguresResult {
   figures: IndicatorFigure[]
@@ -115,7 +117,7 @@ export default class YAxisImp extends AxisImp implements YAxis {
     switch (type) {
       case YAxisType.Percentage: {
         const fromData = visibleDataList[0]?.data
-        if (fromData?.close !== undefined) {
+        if (isNumber(fromData?.close)) {
           min = (min - fromData.close) / fromData.close * 100
           max = (max - fromData.close) / fromData.close * 100
         }
@@ -192,7 +194,7 @@ export default class YAxisImp extends AxisImp implements YAxis {
    * @return {boolean}
    */
   isInCandle (): boolean {
-    return this.getParent().getName() === 'candle'
+    return this.getParent().getId() === PaneIdConstants.CANDLE
   }
 
   /**
@@ -279,7 +281,11 @@ export default class YAxisImp extends AxisImp implements YAxis {
         }
       }
       v = formatThousands(v, thousandsSeparator)
-      if (y > textHeight && y < height - textHeight && ((validY !== undefined && (Math.abs(validY - y) > textHeight * 2)) || validY === undefined)) {
+      const validYNumber = isNumber(validY)
+      if (
+        y > textHeight &&
+        y < height - textHeight &&
+        ((validYNumber && (Math.abs(validY - y) > textHeight * 2)) || !validYNumber)) {
         optimalTicks.push({ text: v, coord: y, value })
         validY = y
       }
@@ -287,7 +293,7 @@ export default class YAxisImp extends AxisImp implements YAxis {
     return optimalTicks
   }
 
-  getAutoSize (): number {
+  override getAutoSize (): number {
     const pane = this.getParent()
     const chart = pane.getChart()
     const styles = chart.getStyles()
@@ -373,7 +379,7 @@ export default class YAxisImp extends AxisImp implements YAxis {
         const chartStore = this.getParent().getChart().getChartStore()
         const visibleDataList = chartStore.getVisibleDataList()
         const fromData = visibleDataList[0]?.data
-        if (fromData?.close !== undefined) {
+        if (isNumber(fromData?.close)) {
           return fromData.close * value / 100 + fromData.close
         }
         return 0
@@ -402,7 +408,7 @@ export default class YAxisImp extends AxisImp implements YAxis {
         const chartStore = this.getParent().getChart().getChartStore()
         const visibleDataList = chartStore.getVisibleDataList()
         const fromData = visibleDataList[0]?.data
-        if (fromData?.close !== undefined) {
+        if (isNumber(fromData?.close)) {
           v = (value - fromData.close) / fromData.close * 100
         }
         break

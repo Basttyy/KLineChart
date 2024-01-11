@@ -1,5 +1,30 @@
 # 📠 更新日志
 
+## 9.7.1
+`2023-12-18`
++ 🐞 修复指标和覆盖物方法不执行问题。
++ 🐞 修复包管理器下载node版本依赖问题。
+
+## 9.7.0
+`2023-12-12`
++ 🆕 实例方法新增`setMaxOffsetLeftDistance`和`setMaxOffsetRightDistance`。
++ 🆕 指标新增`zLevel`属性。
++ 💄 优化`ohlc`蜡烛柱渲染。
++ 🐞 修复蜡烛柱模糊问题。
++ 🐞 修复覆盖物`zLevel`渲染规则。
+
+## 9.6.0
+`2023-11-14`
++ 🖋️ 重构窗口之间的分割线模块。
++ 🆕 图表方法`init(ds, options)`，参数`options`新增`layout`。
++ 🆕 实例方法`createIndicator(value, isStack, paneOptions, callback)`，参数`paneOptions`新增`position`。
++ 🆕 样式`candle.tooltip.custom`新增`turnover`字符串模版。
++ 💄 优化样式`overlay.text`配置。
++ 💄 优化`utils.clone`和`utils.merge`实现。
++ 🐞 修复多个覆盖物样式显示不对问题。
++ 🐞 修复多个指标样式显示不对问题。
+
+
 ## 9.5.4
 `2023-09-22`
 + 🐞 修复样式`candle.type`是`area`时，最新价线不显示问题。
